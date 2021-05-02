@@ -84,7 +84,7 @@ def friendsfeed(request):
         post_to_like = request.POST.get("like")
         print(post_to_like)
         like_already_exists = Like.objects.filter(post_id=post_to_like,username=request.user)
-        if not like_already_exists():
+        if not like_already_exists.exists():
             Like.objects.create(post_id=post_to_like,username=request.user)
             return redirect("FeedApp:friendsfeed")
 
@@ -120,7 +120,7 @@ def friends(request):
     request_sent_profiles = user_relationships.values('receiver')
 
 #who we can send requests to
-    all_profiles = Profile.objects.exclude(user=request.user).exclude(id_in=user_friends_profiles).exclude(id__in=request_sent_profiles)
+    all_profiles = Profile.objects.exclude(user=request.user).exclude(id__in=user_friends_profiles).exclude(id__in=request_sent_profiles)
 
 #get friend request received by user
     request_received_profiles = Relationship.objects.filter(receiver=user_profile,status='sent')
@@ -133,6 +133,7 @@ def friends(request):
     #this is to press 'send' button
     if request.method == 'POST' and request.POST.get("send_requests"):
         receivers = request.POST.getlist("send_requests")
+        print(receivers)
         for receiver in receivers:
             receiver_profile = Profile.objects.get(id=receiver)
             Relationship.objects.create(sender=user_profile,receiver=receiver_profile,status='sent')
@@ -140,12 +141,12 @@ def friends(request):
 
 #this is to process all receive requests
     if request.method == 'POST' and request.POST.get("receive_requests"):
-        senders = request.POST.getlist("friend_requests")
+        senders = request.POST.getlist("receive_requests")
         for sender in senders:
             Relationship.objects.filter(id=sender).update(status='accepted')
 
             #create a relationship object to access the sender's user id
-            relationship_obj = Relationship.objects.get(id-sender)
+            relationship_obj = Relationship.objects.get(id=sender)
             user_profile.friends.add(relationship_obj.sender.user)
 
             #add user to the friends list of sender's profile
