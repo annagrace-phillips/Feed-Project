@@ -4,8 +4,9 @@
 
 {% block content %}
 
-<h1><p> Friends Feed </p></h1>
-<h3><a href="{% url 'FeedApp:friendsfeed' %}"</a></h3>
+<h1><p> Posts </p></h1>
+<form method="POST">
+{% csrf_token %}
 
 <table style="font-size: 25px;width: 100%">
 
@@ -18,12 +19,17 @@
     </td>
     <tr style="border: 1px solid black;padding: 6px;">
         <td>{{ p.date_posted }}</td>
-        <td>Like:  &nbsp  {{1}} &nbsp&nbsp&nbsp</td>
+        <td>
+            <button type="submit" name="like" value={{p.id}} style="background-color: transparent;border: none;">
+            Like:  &nbsp  {{1}} 
+            </button>
+        </td>
         <td>Comments: &nbsp<a href="{% url 'FeedApp:comments' p.id %}">{{c}}</a></td>
     </tr>
 </tr>
 {% endfor %}
 
 </table>
+</form>
 
 {% endblock %}
